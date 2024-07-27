@@ -8,6 +8,17 @@ eventListener();
 // Los Eventos
 function eventListener() {
   formulario.addEventListener('submit', agregarTweet);
+
+  // Cuando el documento esta listo
+  document.addEventListener('DOMContentLoaded', () => {
+    // La manera de obetener los datos
+    tweets = JSON.parse(localStorage.getItem('tweets')) || []; // haz la prueba antes de cargar datos y busca en la pestaña de Application el local storage
+
+    console.log(tweets); // viendo que hay en el array
+
+    // Si hay o no elementos, debemos llamar la funcion
+    crearHTML();
+  })
 }
 
 // Funciones
@@ -23,19 +34,11 @@ function agregarTweet(event) {
 
   const tweetObj = {
     id: Date.now(),
-    tweet: tweet
+    tweet
   }
 
-  // Una vez pasada la validación, añadimos el cada tweet
-
   tweets = [...tweets, tweetObj]
-
-  console.log(tweets);
-
-  // Mostramos en el HTML cada Tweet 
   crearHTML();
-
-  // Reiniciamos el formulario
   formulario.reset();
 
 }
@@ -48,37 +51,36 @@ function mostrarError(error) {
   mensajeError.textContent = error;
   contenedor.appendChild(mensajeError);
 
-
   setTimeout(() => {
     mensajeError.remove()
   }, 2000);
-
 }
 
 function crearHTML() {
-  // console.log('Mostrando tweet...');
 
   if (tweets.length > 0) {
-    // Limpiamos el HTML para que no se repita la data
-    LimpiarHTML(); // Si comentas esta linea veras el resultado
+    LimpiarHTML();
 
     tweets.forEach(x => {
       const { tweet } = x;
-      // Creamos el HTML
       const li = document.createElement('li');
-
-      // Añadimos el texto
       li.innerText = tweet;
-
-      // Insertamos en el HTML
       contenedorTweets.appendChild(li);
-
 
     });
   }
+
+  // Agrega los tweets actuales al Storage
+  sincronizarStorage();
 }
 
-// Limpiar el HTML
+
+function sincronizarStorage() {
+  // console.log('Pal Storage...');
+
+  localStorage.setItem('tweets', JSON.stringify(tweets))
+}
+
 function LimpiarHTML() {
   while (contenedorTweets.firstChild) {
     contenedorTweets.removeChild(contenedorTweets.firstChild)
@@ -89,16 +91,12 @@ function LimpiarHTML() {
 /** 
  * *Comentarios extras
  * 
- * 1.- Una vez pasada la validación, debemos ir guardando lo que escribe el usuario en el array de tweet
+ * 1.- Antes de seguir, podemos optimizar un poco el codigo, especificamente en la parte de como conformamos el objeto, ya que puedes asignar el valor a una propiedad, siempre y cuando se llame igual a la variable donde esta reservado en este caso el tweet.
  * 
- * 2.- En vez de agregar cada tweet en el array, colocaremos un objeto donde contenga el mesaje y un identificador unico, que lo traemos de Date.now().
+ * 2.- Bueno la idea del proyecto, es almacenar los datos en LocalStorage y el mejor lugar, es luego se muestre en el HTML
  * 
- * 3.- Ya cada tweet en el array, debemos proceder a mostrarlo, como es logica de HTML, una vez más lo ideal es separlo en otra funcion.
+ * 3.- Y para que siempre lo veas, a pesar de recargues la pagina; lo cargamos a un evento para cuando el HTML este cargo en su totalidad.
  * 
- * 4.- En esta función crearHTML, validamos si hay algun elemento en el array, ahora te preguntaras, que la primera vez que la utlizamos ya nos aseguramos haya un elemento con la linea anterior, y esto se debe a que esta Fn crearHTML, la utlizaremos en otros lados y si o si debemos vericar que haya algo
- * 
- * 5.- Cuando estamo creanod el HTML que se mostrar, su ultima funcionalida es agreagrlos al HTML cierto ?, bueno como recordaras .appendChild; no borrar elementos previos, solo va incorporando, asi que optmizamos esta parte con una funcion que limpia la iteracio previa.
- * 
- * 6.- Viendo que cada vez que que igresamos un tweet, no se reinicia, usamos el metodo asociado a un formulario, como lo es reset.
+ * 4.- Importante que al momento de cargar el evento de cuando el HTML esta listo (DOMContentLoaded), es que debemos ser consistente con la obtecion de lo datos desde el Local Storage y esto es por que la primera vez que se carga no hay datos, por lo tanto al Local Storage tambien debemos inicializarlo como un array (para este caso) vacio.
  *  
  */
