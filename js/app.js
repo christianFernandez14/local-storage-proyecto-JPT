@@ -57,26 +57,18 @@ function crearHTML() {
 
     tweets.forEach(x => {
       const { tweet, id } = x;
-
-      // Agregando Btn para eliminar
       const btnEliminar = document.createElement('a');
-      // Revisa esta clase en custom del css
       btnEliminar.classList.add('borrar-tweet');
       btnEliminar.textContent = 'X'
 
-      // Añadimos la funcion de eliminar: Este evento lo hacemos como de 
       btnEliminar.onclick = function () {
         borrarTweet(id);
-      }
 
+      }
 
       const li = document.createElement('li');
       li.innerText = tweet;
-
-      // Asignamos el btn a cada uno de los tweet
       li.appendChild(btnEliminar);
-
-
       contenedorTweets.appendChild(li);
 
     });
@@ -84,21 +76,12 @@ function crearHTML() {
   sincronizarStorage();
 }
 
-
 function sincronizarStorage() {
   localStorage.setItem('tweets', JSON.stringify(tweets))
 }
 
-// Borrando un tweet
 function borrarTweet(id) {
-  // console.log('borrando...', id); // viendo que esta tomando referencia al tweet que quiero eliminar
-
-  // Filtramos los elementos y me traiga todos menos el que se le dío click
   tweets = tweets.filter(tweet => (tweet.id !== id))
-
-  console.log(tweets);
-
-  // Aca debemos mostrarlo de nuevo
   crearHTML();
 
 }
@@ -109,12 +92,3 @@ function LimpiarHTML() {
   }
 }
 
-
-/** 
- * *Comentarios extras
- * 
- * 1.- Como toda app web debemos interactuar con ella, trabajemos con la acción de eliminar un tweet espeficco.
- * 
- * 2.- La mejor opcion para ellos es utilizar un filter que estara asociada a un evento del boton eliminar, mismo boton creado de manera local, cada vez que agregues un tweet
- *  
- */
