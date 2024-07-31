@@ -9,14 +9,8 @@ eventListener();
 function eventListener() {
   formulario.addEventListener('submit', agregarTweet);
 
-  // Cuando el documento esta listo
   document.addEventListener('DOMContentLoaded', () => {
-    // La manera de obetener los datos
-    tweets = JSON.parse(localStorage.getItem('tweets')) || []; // haz la prueba antes de cargar datos y busca en la pestaña de Application el local storage
-
-    console.log(tweets); // viendo que hay en el array
-
-    // Si hay o no elementos, debemos llamar la funcion
+    tweets = JSON.parse(localStorage.getItem('tweets')) || [];
     crearHTML();
   })
 }
@@ -57,28 +51,56 @@ function mostrarError(error) {
 }
 
 function crearHTML() {
+  LimpiarHTML();
 
   if (tweets.length > 0) {
-    LimpiarHTML();
 
     tweets.forEach(x => {
-      const { tweet } = x;
+      const { tweet, id } = x;
+
+      // Agregando Btn para eliminar
+      const btnEliminar = document.createElement('a');
+      // Revisa esta clase en custom del css
+      btnEliminar.classList.add('borrar-tweet');
+      btnEliminar.textContent = 'X'
+
+      // Añadimos la funcion de eliminar: Este evento lo hacemos como de 
+      btnEliminar.onclick = function () {
+        borrarTweet(id);
+      }
+
+
       const li = document.createElement('li');
       li.innerText = tweet;
+
+      // Asignamos el btn a cada uno de los tweet
+      li.appendChild(btnEliminar);
+
+
       contenedorTweets.appendChild(li);
 
     });
   }
-
-  // Agrega los tweets actuales al Storage
   sincronizarStorage();
 }
 
 
 function sincronizarStorage() {
-  // console.log('Pal Storage...');
-
   localStorage.setItem('tweets', JSON.stringify(tweets))
+}
+
+// Borrando un tweet
+function borrarTweet(id) {
+  // console.log('borrando...', id); // viendo que esta tomando referencia al tweet que quiero eliminar
+
+  // Filtramos los elementos y me traiga todos menos el que se le dío click
+  tweets = tweets.filter(tweet => (tweet.id !== id))
+
+  console.log(tweets);
+
+  // Aca debemos mostrarlo de nuevo
+  crearHTML();
+
 }
 
 function LimpiarHTML() {
@@ -91,12 +113,8 @@ function LimpiarHTML() {
 /** 
  * *Comentarios extras
  * 
- * 1.- Antes de seguir, podemos optimizar un poco el codigo, especificamente en la parte de como conformamos el objeto, ya que puedes asignar el valor a una propiedad, siempre y cuando se llame igual a la variable donde esta reservado en este caso el tweet.
+ * 1.- Como toda app web debemos interactuar con ella, trabajemos con la acción de eliminar un tweet espeficco.
  * 
- * 2.- Bueno la idea del proyecto, es almacenar los datos en LocalStorage y el mejor lugar, es luego se muestre en el HTML
- * 
- * 3.- Y para que siempre lo veas, a pesar de recargues la pagina; lo cargamos a un evento para cuando el HTML este cargo en su totalidad.
- * 
- * 4.- Importante que al momento de cargar el evento de cuando el HTML esta listo (DOMContentLoaded), es que debemos ser consistente con la obtecion de lo datos desde el Local Storage y esto es por que la primera vez que se carga no hay datos, por lo tanto al Local Storage tambien debemos inicializarlo como un array (para este caso) vacio.
+ * 2.- La mejor opcion para ellos es utilizar un filter que estara asociada a un evento del boton eliminar, mismo boton creado de manera local, cada vez que agregues un tweet
  *  
  */
